@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import {Text, Alert, StyleSheet, View, Button, TextInput, Dimensions, ImageBackground} from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
-// import auth from '@react-native-firebase/auth';
+import auth from '@react-native-firebase/auth';
 
 const {width} = Dimensions.get('window');
 
@@ -11,17 +11,21 @@ const SignInAdmin = ({navigation}) => {
     password: 'admin123',
   });
   const [ShowPasword, setShowPasword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleLogin = async () => {
-    if (authData.userName === 'admin@admin.com' && authData.password === 'admin123') {
-      navigation.navigate('List');
-    }
-    // try {
-    //   await auth().signInWithEmailAndPassword(authData.userName, authData.password);
+    // if (authData.userName === 'admin@admin.com' && authData.password === 'admin123') {
     //   navigation.navigate('List');
-    // } catch (error) {
-    //   Alert.alert('something went wrong', error.message, [{text: 'OK'}]);
     // }
+    try {
+      setIsLoading(true);
+      await auth().signInWithEmailAndPassword(authData.userName, authData.password);
+      navigation.navigate('List');
+      setIsLoading(false);
+    } catch (error) {
+      setIsLoading(false);
+      Alert.alert('something went wrong', error.message, [{text: 'OK'}]);
+    }
   };
 
   const handleShowPassword = () => {
@@ -66,7 +70,12 @@ const SignInAdmin = ({navigation}) => {
               )}
             </View>
           </View>
-          <Button title={'Sign in'} onPress={handleLogin} color="#841584" accessibilityLabel="'Sign in" />
+          <Button
+            title={isLoading ? 'Loading...' : 'Sign in'}
+            onPress={handleLogin}
+            color="#841584"
+            accessibilityLabel={isLoading ? 'Loading...' : 'Sign in'}
+          />
         </View>
       </ImageBackground>
     </View>
